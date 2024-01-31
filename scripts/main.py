@@ -28,7 +28,7 @@ class Suit(Enum):
 #Defines the card class for a single card
 class Card:
     #Initilizes suit, rank, and value of card for logic
-    def init(self, suit, rank, value):
+    def __init__(self, suit, rank, value):
         self.suit = suit
         self.rank = rank
         self.value = value
@@ -39,7 +39,7 @@ class Card:
 
 #Defines the deck class to represent 6 decks of cards
 class Deck:
-    def init(self,numDecks = 6):
+    def __init__(self,numDecks = 6):
         self.cards = [] #Initialize an empty list to hold cards
 
         #Create the specified number of decks and add them to the card list
