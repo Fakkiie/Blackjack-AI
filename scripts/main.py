@@ -15,7 +15,7 @@ ranks = {
     "J" : 10,
     "Q" : 10,
     "K" : 10,
-    "A" : (1,10)
+    "A" : (1,11)
 }
 
 #Defines the Suits as an enum
@@ -60,4 +60,9 @@ class Deck:
             return self.cards.pop(0)
         else:
             return None  #Empty Deck Case
-    #Need to implement a peek feature, add card to bottom, string representation of the deck, and len of deck
+        
+    def Peek(self):
+        if len(self.cards) > 0:
+            return self.cards[0]
+        return None
+    #Need to implement add card to bottom, string representation of the deck, and len of deck for game logic
