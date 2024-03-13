@@ -8,4 +8,4 @@ Strategy Analysis: Evaluate the effectiveness of different strategies by trackin
 Customizable Settings: Adjust the number of decks, the player's starting balance, betting strategies, and more.
 
 Creating a blackjack player using reinforcement learning and Q-learning techniques.
-
+https://github.com/omeedf/blackjack-bot is the original source of this code.
