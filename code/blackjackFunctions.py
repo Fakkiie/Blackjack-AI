@@ -67,7 +67,7 @@ class shoe:
         self.count = 0  # Reset the count when the shoe is shuffled
 
 def getBetSize(shoe, balance):
-    base_bet = 200  # Base bet of $100
+    base_bet = 25 # Min bet of $25
     if shoe.count > 0:
         bet_multiplier = 1 + (shoe.count / 5)
     else:
@@ -135,18 +135,10 @@ def actionIndex(options):
     return action
 
 class Player:
-    def __init__(self, balance=1000000):
+    def __init__(self, balance=20000):
         self.balance = balance
         self.bet = 0
     
     def placeBet(self, shoe):
         self.bet = getBetSize(shoe, self.balance)  # Get bet size based on count and current balance
         self.balance -= self.bet  # Deduct bet from balance
-    
-    def updateBalance(self, outcome):
-        # Assuming outcome is 0 (loss), 1 (win), 2 (push)
-        if outcome == 1:
-            self.balance += self.bet * 2  # Win: get back double the bet
-        elif outcome == 2:
-            self.balance += self.bet  # Push: get back the bet
-        # No need to do anything for a loss as the bet is already deducted

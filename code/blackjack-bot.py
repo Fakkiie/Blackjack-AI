@@ -42,8 +42,8 @@ def playGame(rounds, save_path=None):
     balances = [player.balance]  # Track player balance over time
 
     while rnd < rounds:
-        if rnd % (rounds // 90) == 0:
-            epsilon *= 0.9
+        if rnd % (rounds // (rounds/1000)) == 0:
+            epsilon *= 0.5
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
             bet, reward, result = playRound(s, player, epsilon, gamma)
@@ -69,27 +69,19 @@ def playGame(rounds, save_path=None):
 
     return bets, balances
 
-def playRound(s, player, epsilon, gamma):
+def playRound(s, player: Player, epsilon, gamma):
     h = hand()
     dh = hand()
-    bet = 25
-    # bet = player.placeBet(player, s)  # Minimum bet
     
     # Adjust the bet based on the card count
     # For simplicity, let's just double the reward if the count is positive
     
-    if s.count >= 10:
-        bet *= 10
-    elif s.count > 7:
-        bet *= 5
-    elif s.count > 5:
-        bet *= 2  # Double the bet if the count is positive
-    
-
+    player.placeBet(s)
+    bet = player.bet
     queue = []
     dealHand(h, dh, s)
     surrender = False
-    reward = bet
+    reward = bet*2
 
     while h.handSum < 21:
         state = assignState(h, dh)
@@ -101,23 +93,28 @@ def playRound(s, player, epsilon, gamma):
         elif curr_action == 1:  #stand
             break
         elif curr_action == 2:  #double
-            reward *= 2
-            bet *= 2
+            reward += bet
+            player.balance -= bet
+            # DOUBLE PLAYER's BET
             hit(h, s)
             break
         elif curr_action == 3:  #surrender
             surrender = True
+            player.balance += bet/2
             bet = bet / 2  # Lose half the bet on surrender
             break
     
     dealerPlay(dh, s)
     if surrender == True:
         result = 0
+        reward = bet/2
     else:
         result = determineOutcome(h, dh)
     
     if result == 0:
         reward *= -1
+    elif result == 1:
+        reward = bet + reward
     if result == 2:   #push
         reward = 0
         
