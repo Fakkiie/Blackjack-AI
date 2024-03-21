@@ -44,6 +44,15 @@ def visualize_bets(bets):
     plt.tight_layout()
     plt.show()
 
+def visualize_balance(balance_history):
+    plt.figure(figsize=(10, 6))
+    plt.plot(balance_history, color='blue')
+    plt.title('Bot Balance Over Rounds')
+    plt.xlabel('Round')
+    plt.ylabel('Balance')
+    plt.grid(True)
+    plt.show()
+
 
 def percentChange(current, previous): #returns percent change between current and previous
     if current == previous:
@@ -229,7 +238,7 @@ correct_bs.style.applymap(highlight_actions)
 #dictionary of 22 tested Q tables
 QTables = {}
 for i in range(1, 23):  # Assuming you have 22 Q-tables
-    path = "/Users/landonhadre/documents/school/winter2024/3710/AI PROJECT/blackjack-bot/data/QTables/Q_table-%i.npy" % i
+    path = "/Users/ethan/Documents/Projects/Blackjack_bot/Blackjack-AI/data/QTables/Q_table-%i.npy" % i
     QTables[i] = np.load(path)
 
 
