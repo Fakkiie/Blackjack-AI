@@ -67,11 +67,16 @@ class shoe:
         self.count = 0  # Reset the count when the shoe is shuffled
 
 def getBetSize(shoe, balance):
-    base_bet = 100  # Adjusted to $100 as the standard bet
-    bet = base_bet
+    base_bet = 200  # Base bet of $100
     if shoe.count > 0:
-        bet = base_bet * (1 + (shoe.count / 5))  # Simple dynamic adjustment
+        bet_multiplier = 1 + (shoe.count / 5)
+    else:
+        bet_multiplier = 1  # Do not decrease bet for negative counts
+    
+    bet = base_bet * bet_multiplier
+    bet = max(bet, base_bet)  # Ensure bet is not below base bet
     return min(bet, balance)  # Ensure bet does not exceed current balance
+
 
 
 
@@ -130,7 +135,7 @@ def actionIndex(options):
     return action
 
 class Player:
-    def __init__(self, balance=50000):
+    def __init__(self, balance=1000000):
         self.balance = balance
         self.bet = 0
     

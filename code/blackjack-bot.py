@@ -145,7 +145,7 @@ def whatAction(lst):
     print(lst)
 
 
-bets = playGame(1000, save_path="Q_table.npy")
+bets = playGame(10000000, save_path="Q_table.npy")
 minimum_bet = min(bets)
 average_bet = sum(bets) / len(bets)
 maximum_bet = max(bets)

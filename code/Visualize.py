@@ -247,7 +247,3 @@ reverse_states_dict = {}
 
 for i in np.arange(len(all_states)):
     reverse_states_dict[str(all_states[i])] = i
-
-def checkQrow(Q, state):
-    row_num = reverse_states_dict[state]
-    return Q[row_num]
