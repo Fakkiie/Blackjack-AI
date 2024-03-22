@@ -39,7 +39,10 @@ class shoe:
     def __init__(self):
         self.cards = []
         self.shufflePoint = 0
-        self.count = 0  # Initialize count for card counting
+        self.cardsDelt = 0
+        self.decksDelt = 0
+        self.running_count = 0 
+        self.true_count = 0
         for _ in np.arange(6):
             for i in [11,2,3,4,5,6,7,8,9,10,10,10,10]:
                 for j in ['clubs', 'hearts', 'spades', 'diamonds']:
@@ -51,30 +54,36 @@ class shoe:
         card = self.cards.pop(0)
         self.updateCount(card)  # Update the count based on the card value
         self.cards.append(card)
+        self.cardsDelt += 1
         self.shufflePoint += 1
+
+        if self.cardsDelt % 52 == 0:
+            self.decksDelt += 1
+
         return card
     
     def updateCount(self, card: card):
         # Hi-Lo Counting Strategy
         if card.value >= 2 and card.value <= 6:
-            self.count += 1
+            self.running_count += 1
         elif card.value >= 10:  # 10, J, Q, K, Ace
-            self.count -= 1
+            self.running_count -= 1
+        self.true_count = self.running_count // (6 - self.decksDelt)
     
     def shuffleShoe(self):
         random.shuffle(self.cards)
         self.shufflePoint = 0
-        self.count = 0  # Reset the count when the shoe is shuffled
+        self.running_count = 0  # Reset the count when the shoe is shuffled
+        self.cardsDelt = 0
+        self.decksDelt = 0
 
 def getBetSize(shoe: shoe, balance):
-    base_bet = 100 # Min bet of $25
-    if shoe.count > 15:
-        bet_multiplier = 1 + (shoe.count)
-    elif shoe.count > 5:
-        #bet_multiplier = 1 + (shoe.count/5)
-        bet_multiplier = 0
-    else:
-        bet_multiplier = 0  # Do not decrease bet for negative counts
+    base_bet = 25 # Min bet of $25
+    
+    if shoe.true_count > 2:
+        bet_multiplier = 1 + (shoe.true_count)
+    else: 
+        bet_multiplier = 1
     
     bet = base_bet * bet_multiplier
     #bet = max(bet, base_bet)  # Ensure bet is not below base bet
@@ -140,7 +149,7 @@ def actionIndex(options):
     return action
 
 class Player:
-    def __init__(self, balance=10000):
+    def __init__(self, balance=100000):
         self.balance = balance
         self.bet = 0
     

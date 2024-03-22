@@ -41,28 +41,28 @@ def playGame(rounds, save_path=None):
     balances = []  # Track player balance over time
 
     while rnd < rounds: #and player.balance > 0:
-        if rnd % (rounds // 300) == 0:
+        if rnd % (rounds // 90) == 0:
             epsilon *= 0.9
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
             bet, reward, result = playRound(s, player, epsilon, gamma)
             player.balance += reward
-            #if rnd >= rounds-10000:
-            if result == 2:
-                record.append(0.5)
-            else:
-                record.append(result)
+            if rnd >= rounds-10000:
+                if result == 2:
+                    record.append(0.5)
+                else:
+                    record.append(result)
             balances.append(player.balance)
             bets.append(bet)  # Store the bet size
         else:
             s.shuffleShoe()
             bet, reward, result = playRound(s, player, epsilon, gamma)
             player.balance += reward
-            #if rnd >= rounds-10000:
-            if result == 2:
-                record.append(0.5)
-            else:
-                record.append(result)
+            if rnd >= rounds-10000:
+                if result == 2:
+                    record.append(0.5)
+                else:
+                    record.append(result)
             balances.append(player.balance) 
             bets.append(bet)  # Store the bet size
         rnd += 1
@@ -86,7 +86,8 @@ def playRound(s, player: Player, epsilon, gamma):
     queue = []
     dealHand(h, dh, s)
     surrender = False
-    reward = bet*2
+    reward = bet
+    q_reward = 10
 
     while h.handSum < 21:
         state = assignState(h, dh)
@@ -103,24 +104,23 @@ def playRound(s, player: Player, epsilon, gamma):
             break
         elif curr_action == 3:  #surrender
             surrender = True
-            bet = bet / 2  # Lose half the bet on surrender
+            reward = reward / 2  # Lose half the bet on surrender
             break
     
     dealerPlay(dh, s)
     if surrender == True:
         result = 0
-        reward = bet
     else:
         result = determineOutcome(h, dh)
     
     if result == 0:     #loss
         reward *= -1 
-    elif result == 1:   #win
-        reward = reward 
+        q_reward *= -1
     elif result == 2:   #push
         reward = 0
+        q_reward = 0
         
-    updateQ(queue, reward, gamma)
+    updateQ(queue, q_reward, gamma)
     return bet, reward, result
 
 def updateQ(queue, reward, gamma):
@@ -159,7 +159,7 @@ def whatAction(lst):
     print(lst)
 
 
-[bets, balance_history, record] = playGame(4000000, save_path="Q_table.npy")
+[bets, balance_history, record] = playGame(9000000, save_path="Q_table.npy")
 minimum_bet = min(bets)
 average_bet = sum(bets) / len(bets)
 maximum_bet = max(bets)
@@ -174,7 +174,7 @@ print("Ending balance:", balance_history[-1])
 #Generate Tables/Graphs and display them
 basic_strategy = pd.DataFrame(columns=dealer_upcard, index=no_ace_hand + ace_hand) 
 Q_loaded = np.load("Q_table.npy")
-generateBS(Q_loaded, basic_strategy, 'within 0.5%')  
+generateBS(Q_loaded, basic_strategy, 'None')  
 visualize_basic_strategy(basic_strategy)
-visualize_bets(bets)
+# visualize_bets(bets)
 visualize_balance(balance_history)
