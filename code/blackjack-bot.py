@@ -38,27 +38,32 @@ def playGame(rounds, save_path=None):
     gamma = 0.35
     record = []
     bets = []  # Track all bets
-    outcomes = []  # Track win(1), loss(0), push(2)
-    balances = [player.balance]  # Track player balance over time
+    balances = []  # Track player balance over time
 
-    while rnd < rounds:
-        if rnd % (rounds // (rounds/1000)) == 0:
-            epsilon *= 0.5
+    while rnd < rounds: #and player.balance > 0:
+        if rnd % (rounds // 200) == 0:
+            epsilon *= 0.9
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
             bet, reward, result = playRound(s, player, epsilon, gamma)
-            if result == 1:  # Win
-                player.balance += reward
+            player.balance += reward
+            #if rnd >= rounds-10000:
+            if result == 2:
+                record.append(0.5)
+            else:
+                record.append(result)
             balances.append(player.balance)
-            record.append(result)
             bets.append(bet)  # Store the bet size
         else:
             s.shuffleShoe()
             bet, reward, result = playRound(s, player, epsilon, gamma)
-            if result == 1:  # Win
-                player.balance += reward
-            balances.append(player.balance)
-            record.append(result)
+            player.balance += reward
+            #if rnd >= rounds-10000:
+            if result == 2:
+                record.append(0.5)
+            else:
+                record.append(result)
+            balances.append(player.balance) 
             bets.append(bet)  # Store the bet size
         rnd += 1
         
@@ -67,7 +72,7 @@ def playGame(rounds, save_path=None):
         np.save(save_path, Q)  # Save the Q-table to the specified path
         print(f"Q-table saved to {save_path}")
 
-    return bets, balances
+    return bets, balances, record
 
 def playRound(s, player: Player, epsilon, gamma):
     h = hand()
@@ -81,7 +86,7 @@ def playRound(s, player: Player, epsilon, gamma):
     queue = []
     dealHand(h, dh, s)
     surrender = False
-    reward = bet*2
+    reward = bet
 
     while h.handSum < 21:
         state = assignState(h, dh)
@@ -93,29 +98,26 @@ def playRound(s, player: Player, epsilon, gamma):
         elif curr_action == 1:  #stand
             break
         elif curr_action == 2:  #double
-            reward += bet
-            player.balance -= bet
-            # DOUBLE PLAYER's BET
+            reward *= 2
             hit(h, s)
             break
         elif curr_action == 3:  #surrender
             surrender = True
-            player.balance += bet/2
             bet = bet / 2  # Lose half the bet on surrender
             break
     
     dealerPlay(dh, s)
     if surrender == True:
         result = 0
-        reward = bet/2
+        reward = bet
     else:
         result = determineOutcome(h, dh)
     
-    if result == 0:
-        reward *= -1
-    elif result == 1:
-        reward = bet + reward
-    if result == 2:   #push
+    if result == 0:     #loss
+        reward *= -1 
+    elif result == 1:   #win
+        reward = reward   
+    elif result == 2:   #push
         reward = 0
         
     updateQ(queue, reward, gamma)
@@ -157,14 +159,16 @@ def whatAction(lst):
     print(lst)
 
 
-[bets, balance_history] = playGame(1000000, save_path="Q_table.npy")
+[bets, balance_history, record] = playGame(1000000, save_path="Q_table.npy")
 minimum_bet = min(bets)
 average_bet = sum(bets) / len(bets)
 maximum_bet = max(bets)
+winrate = sum(record) / len(record)
 
 print("Minimum bet size:", minimum_bet)
 print("Average bet size:", average_bet)
 print("Maximum bet size:", maximum_bet)
+print("Winrate:", winrate)
 print("Ending balance:", balance_history[-1])
 
 #Generate Tables/Graphs and display them
