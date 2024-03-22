@@ -34,14 +34,14 @@ def playGame(rounds, save_path=None):
     s = shoe()
     player = Player()  # Assuming starting balance is set in Player's __init__
     rnd = 0
-    epsilon = 0.8
-    gamma = 0.35
+    epsilon = 0.8 #0.8
+    gamma = 0.35 #0.35
     record = []
     bets = []  # Track all bets
     balances = []  # Track player balance over time
 
     while rnd < rounds: #and player.balance > 0:
-        if rnd % (rounds // 200) == 0:
+        if rnd % (rounds // 300) == 0:
             epsilon *= 0.9
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
@@ -86,7 +86,7 @@ def playRound(s, player: Player, epsilon, gamma):
     queue = []
     dealHand(h, dh, s)
     surrender = False
-    reward = bet
+    reward = bet*2
 
     while h.handSum < 21:
         state = assignState(h, dh)
@@ -116,7 +116,7 @@ def playRound(s, player: Player, epsilon, gamma):
     if result == 0:     #loss
         reward *= -1 
     elif result == 1:   #win
-        reward = reward   
+        reward = reward 
     elif result == 2:   #push
         reward = 0
         
@@ -134,7 +134,7 @@ def updateQ(queue, reward, gamma):
         rowNum = states_dict[curr_state]
         
         Q[rowNum][curr_action] += lr * (reward * (gamma ** i))
-        i += 2
+        i += 1
         
 
 def chooseAction(state, Q, epsilon):
@@ -159,7 +159,7 @@ def whatAction(lst):
     print(lst)
 
 
-[bets, balance_history, record] = playGame(1000000, save_path="Q_table.npy")
+[bets, balance_history, record] = playGame(4000000, save_path="Q_table.npy")
 minimum_bet = min(bets)
 average_bet = sum(bets) / len(bets)
 maximum_bet = max(bets)

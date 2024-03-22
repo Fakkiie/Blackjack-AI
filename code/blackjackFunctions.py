@@ -58,7 +58,7 @@ class shoe:
         # Hi-Lo Counting Strategy
         if card.value >= 2 and card.value <= 6:
             self.count += 1
-        elif card.value >= 10 or card.value == 11:  # 10, J, Q, K, Ace
+        elif card.value >= 10:  # 10, J, Q, K, Ace
             self.count -= 1
     
     def shuffleShoe(self):
@@ -67,11 +67,14 @@ class shoe:
         self.count = 0  # Reset the count when the shoe is shuffled
 
 def getBetSize(shoe: shoe, balance):
-    base_bet = 1 # Min bet of $25
-    if shoe.count > 0:
-        bet_multiplier = 1 + (shoe.count/5)
+    base_bet = 100 # Min bet of $25
+    if shoe.count > 15:
+        bet_multiplier = 1 + (shoe.count)
+    elif shoe.count > 5:
+        #bet_multiplier = 1 + (shoe.count/5)
+        bet_multiplier = 0
     else:
-        bet_multiplier = 1  # Do not decrease bet for negative counts
+        bet_multiplier = 0  # Do not decrease bet for negative counts
     
     bet = base_bet * bet_multiplier
     #bet = max(bet, base_bet)  # Ensure bet is not below base bet
