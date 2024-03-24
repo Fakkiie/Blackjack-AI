@@ -30,7 +30,7 @@ states_dict = {}
 for i in np.arange(len(all_states)):
     states_dict[str(all_states[i])] = i
 
-def playGame(rounds, save_path=None):
+def playGame(rounds, save_path):
     s = shoe()
     player = Player()  # Assuming starting balance is set in Player's __init__
     rnd = 0
@@ -42,7 +42,7 @@ def playGame(rounds, save_path=None):
 
     while rnd < rounds: #and player.balance > 0:
         if rnd % (rounds // 90) == 0:
-            epsilon *= 0.9
+            epsilon *= 0.95
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
             bet, reward, result = playRound(s, player, epsilon, gamma)
@@ -74,12 +74,9 @@ def playGame(rounds, save_path=None):
 
     return bets, balances, record
 
-def playRound(s, player: Player, epsilon, gamma):
+def playRound(s: shoe, player: Player, epsilon, gamma):
     h = hand()
     dh = hand()
-    
-    # Adjust the bet based on the card count
-    # For simplicity, let's just double the reward if the count is positive
     
     player.placeBet(s)
     bet = player.bet
@@ -88,6 +85,7 @@ def playRound(s, player: Player, epsilon, gamma):
     surrender = False
     reward = bet
     q_reward = 10
+
 
     while h.handSum < 21:
         state = assignState(h, dh)
@@ -100,11 +98,13 @@ def playRound(s, player: Player, epsilon, gamma):
             break
         elif curr_action == 2:  #double
             reward *= 2
+            q_reward *= 2
             hit(h, s)
             break
         elif curr_action == 3:  #surrender
             surrender = True
-            reward = reward / 2  # Lose half the bet on surrender
+            reward *= 0.5  # Lose half the bet on surrender
+            q_reward *= 1
             break
     
     dealerPlay(dh, s)
@@ -134,7 +134,7 @@ def updateQ(queue, reward, gamma):
         rowNum = states_dict[curr_state]
         
         Q[rowNum][curr_action] += lr * (reward * (gamma ** i))
-        i += 1
+        i += 2
         
 
 def chooseAction(state, Q, epsilon):

@@ -24,6 +24,9 @@ class hand:
     def resetHand(self):
         self.cards = []
         self.handSum = 0
+    
+    def printHand(self):
+        return self.handSum
         
         
 class card:
@@ -78,9 +81,13 @@ class shoe:
         self.decksDelt = 0
 
 def getBetSize(shoe: shoe, balance):
-    base_bet = 25 # Min bet of $25
+    base_bet = 1 # Min bet of $25
     
-    if shoe.true_count > 2:
+    if shoe.true_count >= 10:
+        bet_multiplier = 1000 + (shoe.true_count)
+    elif shoe.true_count >= 5:
+        bet_multiplier = 50 + (shoe.true_count)
+    elif shoe.true_count >= 2:
         bet_multiplier = 1 + (shoe.true_count)
     else: 
         bet_multiplier = 1
@@ -89,9 +96,6 @@ def getBetSize(shoe: shoe, balance):
     #bet = max(bet, base_bet)  # Ensure bet is not below base bet
     return bet #min(bet, balance)  # Ensure bet does not exceed current balance
 
-
-
-
 def hit(hand: hand, shoe: shoe):
     hand.addCard(shoe.getNext())
 
@@ -99,7 +103,7 @@ def dealHand(h, dh, s):
     hit(h, s)
     hit(dh, s)
     hit(h, s)
-    hit(dh, s)
+    # hit(dh, s)
 
 def dealerPlay(dh: hand, s: shoe):
     while (dh.handSum < 17):
@@ -112,7 +116,7 @@ Q = np.zeros((state_size, action_size))
 
 
 
-def assignState(h, dh):
+def assignState(h: hand, dh: hand):
     current_sum = h.handSum
     dealer_upcard = dh.cards[0].value
     aces = h.ace_count
