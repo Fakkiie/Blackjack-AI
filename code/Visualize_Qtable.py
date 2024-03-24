@@ -33,7 +33,7 @@ def playGame_visualize():
     while rnd < 10: #and player.balance > 0:
         print(f"Round {rnd+1}")
         bet, reward, result = playRound_visualize(s, player)
-        print(f"Result: {result} (0: loss, 1: win, 2: push)")
+        print(f"Result: {result} (0: loss, 1: win, 2: push, 3: walked)")
         player.balance += reward
         print(f"Player Bet: {bet}")
         print(f"Player won/lost: {reward}")

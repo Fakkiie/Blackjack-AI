@@ -50,7 +50,7 @@ def playGame(rounds, save_path):
             if rnd >= rounds-10000:
                 if result == 2:
                     record.append(0.5)
-                else:
+                elif result != 3:
                     record.append(result)
             balances.append(player.balance)
             bets.append(bet)  # Store the bet size
@@ -85,37 +85,41 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
     surrender = False
     reward = bet
 
-
-    while h.handSum < 21:
-        state = assignState(h, dh)
-        curr_action = chooseAction(state, Q, epsilon)
-        queue.append([state, curr_action])
+    if s.true_count < 0:
+        while h.handSum < 21:
+            state = assignState(h, dh)
+            curr_action = chooseAction(state, Q, epsilon)
+            queue.append([state, curr_action])
+            
+            if curr_action == 0:    #hit
+                hit(h, s)
+            elif curr_action == 1:  #stand
+                break
+            elif curr_action == 2:  #double
+                reward *= 2
+                hit(h, s)
+                break
+            elif curr_action == 3:  #surrender
+                surrender = True
+                reward *= 0.5  # Lose half the bet on surrender
+                break
         
-        if curr_action == 0:    #hit
-            hit(h, s)
-        elif curr_action == 1:  #stand
-            break
-        elif curr_action == 2:  #double
-            reward *= 2
-            hit(h, s)
-            break
-        elif curr_action == 3:  #surrender
-            surrender = True
-            reward *= 0.5  # Lose half the bet on surrender
-            break
-    
-    dealerPlay(dh, s)
-    if surrender == True:
-        result = 0
-    else:
-        result = determineOutcome(h, dh)
-    
-    if result == 0:     #loss
-        reward *= -1 
-    elif result == 2:   #push
+        dealerPlay(dh, s)
+        if surrender == True:
+            result = 0
+        else:
+            result = determineOutcome(h, dh)
+        
+        if result == 0:     #loss
+            reward *= -1 
+        elif result == 2:   #push
+            reward = 0
+            
+        updateQ(queue, reward, gamma)
+    else: 
         reward = 0
-        
-    updateQ(queue, reward, gamma)
+        result = 3
+
     return bet, reward, result
 
 def updateQ(queue, reward, gamma):
