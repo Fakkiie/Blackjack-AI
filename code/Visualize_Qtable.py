@@ -27,7 +27,6 @@ def playGame_visualize():
     s = shoe()
     player = Player()  # Assuming starting balance is set in Player's __init__
     rnd = 0
-    s.running_count += 15
 
     print("Playing Game:")
     print("---------------------")
@@ -55,8 +54,8 @@ def playRound_visualize(s: shoe, player: Player):
 
     if s.true_count < 0:
         print("** Walked **")
-        return bet, 0, 3 
-    else: 
+        return bet, 0, 3
+    else:
         while h.handSum < 21:
             state = assignState(h, dh)
             curr_action = chooseAction(state, Q_play)
