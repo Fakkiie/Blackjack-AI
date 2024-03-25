@@ -61,7 +61,7 @@ def playGame(rounds, save_path):
             if rnd >= rounds-10000:
                 if result == 2:
                     record.append(0.5)
-                else:
+                elif result != 3:
                     record.append(result)
             balances.append(player.balance) 
             bets.append(bet)  # Store the bet size
@@ -84,7 +84,7 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
     surrender = False
     reward = bet
 
-    if s.true_count < 0:
+    if s.true_count > 0:
         while h.handSum < 21:
             state = assignState(h, dh)
             curr_action = chooseAction(state, Q, epsilon)
@@ -100,7 +100,7 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
                 break
             elif curr_action == 3:  #surrender
                 surrender = True
-                reward *= 0.5  # Lose half the bet on surrender
+                reward *= 1  # Lose half the bet on surrender
                 break
         
         dealerPlay(dh, s)
