@@ -5,9 +5,6 @@ import seaborn as sns
 import heapq
 import ast
 from matplotlib.colors import ListedColormap
-from dotenv import load_dotenv
-
-load_dotenv()
 
 def visualize_basic_strategy(basic_strategy):
     # Map actions to numerical values for coloring

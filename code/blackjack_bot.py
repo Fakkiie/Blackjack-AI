@@ -78,13 +78,11 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
     h = hand()
     dh = hand()
     
-    player.placeBet(s)
-    bet = player.bet
+    bet = 10
     queue = []
     dealHand(h, dh, s)
     surrender = False
     reward = bet
-    q_reward = 10
 
     if s.true_count < 0:
         while h.handSum < 21:
@@ -98,13 +96,11 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
                 break
             elif curr_action == 2:  #double
                 reward *= 2
-                q_reward *= 2
                 hit(h, s)
                 break
             elif curr_action == 3:  #surrender
                 surrender = True
                 reward *= 0.5  # Lose half the bet on surrender
-                q_reward *= 1
                 break
         
         dealerPlay(dh, s)
@@ -115,12 +111,10 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
         
         if result == 0:     #loss
             reward *= -1 
-            q_reward *= -1
         elif result == 2:   #push
             reward = 0
-            q_reward = 0
             
-        updateQ(queue, q_reward, gamma)
+        updateQ(queue, reward, gamma)
     else: 
         reward = 0
         result = 3
