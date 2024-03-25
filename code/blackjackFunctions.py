@@ -81,10 +81,10 @@ class shoe:
         self.decksDelt = 0
 
 def getBetSize(shoe: shoe, balance):
-    base_bet = 1 # Min bet of $25
+    base_bet = 10 # Min bet of $10
     
     if shoe.true_count >= 10:
-        bet_multiplier = 1000 + (shoe.true_count)
+        bet_multiplier = 100 + (shoe.true_count)
     elif shoe.true_count >= 5:
         bet_multiplier = 50 + (shoe.true_count)
     elif shoe.true_count >= 2:
