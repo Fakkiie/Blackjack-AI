@@ -42,7 +42,7 @@ def playGame(rounds, save_path):
 
     while rnd < rounds: #and player.balance > 0:
         if rnd % (rounds // 90) == 0:
-            epsilon *= 0.95
+            epsilon *= 0.90
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
             bet, reward, result = playRound(s, player, epsilon, gamma)
@@ -84,40 +84,37 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
     surrender = False
     reward = bet
 
-    if s.true_count > 0:
-        while h.handSum < 21:
-            state = assignState(h, dh)
-            curr_action = chooseAction(state, Q, epsilon)
-            queue.append([state, curr_action])
-            
-            if curr_action == 0:    #hit
-                hit(h, s)
-            elif curr_action == 1:  #stand
-                break
-            elif curr_action == 2:  #double
-                reward *= 2
-                hit(h, s)
-                break
-            elif curr_action == 3:  #surrender
-                surrender = True
-                reward *= 1  # Lose half the bet on surrender
-                break
+    while h.handSum < 21:
+        state = assignState(h, dh)
+        curr_action = chooseAction(state, Q, epsilon)
+        queue.append([state, curr_action])
         
-        dealerPlay(dh, s)
-        if surrender == True:
-            result = 0
-        else:
-            result = determineOutcome(h, dh)
-        
-        if result == 0:     #loss
-            reward *= -1 
-        elif result == 2:   #push
-            reward = 0
-            
-        updateQ(queue, reward, gamma)
-    else: 
+        if curr_action == 0:    #hit
+            hit(h, s)
+        elif curr_action == 1:  #stand
+            break
+        elif curr_action == 2:  #double
+            reward *= 2
+            hit(h, s)
+            break
+        elif curr_action == 3:  #surrender
+            surrender = True
+            reward *= 1  # Lose half the bet on surrender
+            break
+    
+    dealerPlay(dh, s)
+    if surrender == True:
+        result = 0
+    else:
+        result = determineOutcome(h, dh)
+    
+    if result == 0:     #loss
+        reward *= -1 
+    elif result == 2:   #push
         reward = 0
-        result = 3
+        
+    updateQ(queue, reward, gamma)
+
 
     return bet, reward, result
 
