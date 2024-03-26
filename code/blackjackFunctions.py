@@ -24,9 +24,6 @@ class hand:
     def resetHand(self):
         self.cards = []
         self.handSum = 0
-    
-    def printHand(self):
-        return self.handSum
         
         
 class card:
@@ -42,8 +39,8 @@ class shoe:
     def __init__(self):
         self.cards = []
         self.shufflePoint = 0
-        self.cardsDelt = 0
-        self.decksDelt = 0
+        self.cardsDealt = 0
+        self.decksDealt = 0
         self.running_count = 0 
         self.true_count = 0
         for _ in np.arange(6):
@@ -57,11 +54,11 @@ class shoe:
         card = self.cards.pop(0)
         self.updateCount(card)  # Update the count based on the card value
         self.cards.append(card)
-        self.cardsDelt += 1
+        self.cardsDealt += 1
         self.shufflePoint += 1
 
-        if self.cardsDelt % 52 == 0:
-            self.decksDelt += 1
+        if self.cardsDealt % 52 == 0:
+            self.decksDealt += 1
 
         return card
     
@@ -71,14 +68,14 @@ class shoe:
             self.running_count += 1
         elif card.value >= 10:  # 10, J, Q, K, Ace
             self.running_count -= 1
-        self.true_count = self.running_count // (6 - self.decksDelt)
+        self.true_count = self.running_count // (6 - self.decksDealt)
     
     def shuffleShoe(self):
         random.shuffle(self.cards)
         self.shufflePoint = 0
         self.running_count = 0  # Reset the count when the shoe is shuffled
-        self.cardsDelt = 0
-        self.decksDelt = 0
+        self.cardsDealt = 0
+        self.decksDealt = 0
 
 def getBetSize(shoe: shoe, balance):
     base_bet = 10 # Min bet of $10
@@ -103,7 +100,7 @@ def dealHand(h, dh, s):
     hit(h, s)
     hit(dh, s)
     hit(h, s)
-    # hit(dh, s)
+    hit(dh, s)
 
 def dealerPlay(dh: hand, s: shoe):
     while (dh.handSum < 17):
