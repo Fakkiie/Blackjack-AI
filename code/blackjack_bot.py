@@ -42,7 +42,7 @@ def playGame(rounds, save_path):
 
     while rnd < rounds: #and player.balance > 0:
         if rnd % (rounds // 90) == 0:
-            epsilon *= 0.95
+            epsilon *= 0.90
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
             bet, reward, result = playRound(s, player, epsilon, gamma)
@@ -61,7 +61,7 @@ def playGame(rounds, save_path):
             if rnd >= rounds-10000:
                 if result == 2:
                     record.append(0.5)
-                else:
+                elif result != 3:
                     record.append(result)
             balances.append(player.balance) 
             bets.append(bet)  # Store the bet size
@@ -106,20 +106,20 @@ def playRound(s: shoe, player: Player, epsilon, gamma):
             q_reward *= 1
             break
         
-        dealerPlay(dh, s)
-        if surrender == True:
-            result = 0
-        else:
-            result = determineOutcome(h, dh)
+    dealerPlay(dh, s)
+    if surrender == True:
+        result = 0
+    else:
+        result = determineOutcome(h, dh)
+    
+    if result == 0:     #loss
+        reward *= -1 
+        q_reward *= -1
+    elif result == 2:   #push
+        reward = 0
+        q_reward = 0
         
-        if result == 0:     #loss
-            reward *= -1 
-            q_reward *= -1
-        elif result == 2:   #push
-            reward = 0
-            q_reward = 0
-            
-        updateQ(queue, q_reward, gamma)
+    updateQ(queue, q_reward, gamma)
 
     return bet, reward, result
 
