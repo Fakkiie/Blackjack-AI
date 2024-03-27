@@ -80,12 +80,12 @@ class shoe:
 def getBetSize(shoe: shoe, balance):
     base_bet = 10 # Min bet of $10
     
-    if shoe.true_count >= 7:
-        bet_multiplier = 1
+    if shoe.true_count >= 10:
+        bet_multiplier = 50 + (shoe.true_count)
     elif shoe.true_count >= 5:
-        bet_multiplier = 20 + (shoe.true_count)
+        bet_multiplier = 25 + (shoe.true_count)
     elif shoe.true_count >= 2:
-        bet_multiplier = 100 + (shoe.true_count)
+        bet_multiplier = 1 + (shoe.true_count)
     else: 
         bet_multiplier = 1
     

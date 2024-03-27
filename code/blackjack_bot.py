@@ -42,7 +42,7 @@ def playGame(rounds, save_path):
 
     while rnd < rounds: #and player.balance > 0:
         if rnd % (rounds // 90) == 0:
-            epsilon *= 0.95
+            epsilon *= 0.90
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
             bet, reward, result = playRound(s, player, epsilon, gamma)
