@@ -81,12 +81,12 @@ class shoe:
         self.decksDelt = 0
 
 def getBetSize(shoe: shoe, balance):
-    base_bet = 1 # Min bet of $25
+    base_bet = 10 # Min bet of $25
     
     if shoe.true_count >= 10:
-        bet_multiplier = 1000 + (shoe.true_count)
-    elif shoe.true_count >= 5:
         bet_multiplier = 50 + (shoe.true_count)
+    elif shoe.true_count >= 5:
+        bet_multiplier = 25 + (shoe.true_count)
     elif shoe.true_count >= 2:
         bet_multiplier = 1 + (shoe.true_count)
     else: 
@@ -103,7 +103,7 @@ def dealHand(h, dh, s):
     hit(h, s)
     hit(dh, s)
     hit(h, s)
-    # hit(dh, s)
+    hit(dh, s)
 
 def dealerPlay(dh: hand, s: shoe):
     while (dh.handSum < 17):

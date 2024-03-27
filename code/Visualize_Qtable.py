@@ -51,41 +51,44 @@ def playRound_visualize(s: shoe, player: Player):
     reward = bet
 
     print(f"\tTrue Count: {s.true_count}")
-
-    while h.handSum < 21:
-        state = assignState(h, dh)
-        curr_action = chooseAction(state, Q_play)
-        print(f"\tHand: {h.handSum}")
-        print(f"\tDealer Showing: {dh.handSum}")
-        print(f"\tAction: {curr_action} (0: hit, 1: stand, 2: double, 3: surrender)")
-
-        
-        if curr_action == 0:    #hit
-            hit(h, s)
-            print(f"\tNew Hand: {h.handSum}")
-        elif curr_action == 1:  #stand
-            break
-        elif curr_action == 2:  #double
-            reward *= 2
-            hit(h, s)
-            print(f"\tNew Hand: {h.handSum}")
-            break
-        elif curr_action == 3:  #surrender
-            surrender = True
-            reward *= 0.5 
-            break
-    
-    dealerPlay(dh, s)
-    print(f"\tDealer Hand: {dh.handSum}")
-    if surrender == True:
-        result = 0
+    if s.true_count < 0:
+        print("** Walked **")
+        return bet, 0, 3
     else:
-        result = determineOutcome(h, dh)
-    
-    if result == 0:     #loss
-        reward *= -1 
-    elif result == 2:   #push
-        reward = 0
+        while h.handSum < 21:
+            state = assignState(h, dh)
+            curr_action = chooseAction(state, Q_play)
+            print(f"\tHand: {h.handSum}")
+            print(f"\tDealer Showing: {dh.handSum}")
+            print(f"\tAction: {curr_action} (0: hit, 1: stand, 2: double, 3: surrender)")
+
+            
+            if curr_action == 0:    #hit
+                hit(h, s)
+                print(f"\tNew Hand: {h.handSum}")
+            elif curr_action == 1:  #stand
+                break
+            elif curr_action == 2:  #double
+                reward *= 2
+                hit(h, s)
+                print(f"\tNew Hand: {h.handSum}")
+                break
+            elif curr_action == 3:  #surrender
+                surrender = True
+                reward *= 0.5 
+                break
+        
+        dealerPlay(dh, s)
+        print(f"\tDealer Hand: {dh.handSum}")
+        if surrender == True:
+            result = 0
+        else:
+            result = determineOutcome(h, dh)
+        
+        if result == 0:     #loss
+            reward *= -1 
+        elif result == 2:   #push
+            reward = 0
     
     return bet, reward, result
 
