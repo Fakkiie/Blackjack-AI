@@ -6,7 +6,6 @@ import heapq
 import ast
 from matplotlib.colors import ListedColormap
 
-
 def visualize_basic_strategy(basic_strategy):
     # Map actions to numerical values for coloring
     action_map = {'Hit': 0, 'Hit (c)': 0, 'Stand': 1, 'Stand (c)': 1, 'Double': 2, 'Surrender': 3,
@@ -42,6 +41,15 @@ def visualize_bets(bets):
     ax[1].set_ylabel('Bet Size')
 
     plt.tight_layout()
+    plt.show()
+
+def visualize_balance(balance_history):
+    plt.figure(figsize=(10, 6))
+    plt.plot(balance_history, color='blue')
+    plt.title('Bot Balance Over Rounds')
+    plt.xlabel('Round')
+    plt.ylabel('Balance')
+    plt.grid(True)
     plt.show()
 
 
@@ -153,7 +161,7 @@ for i in np.arange(len(all_states)):
 
 #-------------------generates basic strategy table according to Q and with any corrections desired-----------------
     
-def generateBS(Q, basic_strategy, correction = 'None'):
+def generateBS(Q, basic_strategy, correction):
     for num, row in enumerate(Q):
         state = states_dict[num]
         action = whichAction(row)
@@ -226,22 +234,22 @@ correct_bs.loc['A,8'] = ["Stand", "Stand", "Stand", "Stand", "Double", "Stand","
 correct_bs.loc['A,9'] = "Stand"
 correct_bs.style.applymap(highlight_actions)
 
-#dictionary of 22 tested Q tables
-QTables = {}
-for i in range(1, 23):  # Assuming you have 22 Q-tables
-    path = "/Users/landonhadre/documents/school/winter2024/3710/AI PROJECT/blackjack-bot/data/QTables/Q_table-%i.npy" % i
-    QTables[i] = np.load(path)
+# #dictionary of 22 tested Q tables
+# QTables = {}
+# for i in range(1, 23):  # Assuming you have 22 Q-tables
+#     path = "/Users/ethan/Documents/Projects/Blackjack_bot/Blackjack-AI/data/QTables/Q_table-%i.npy" % i
+#     QTables[i] = np.load(path)
 
 
-generateBS(QTables[19], basic_strategy)
-#empty corrected basic strategy data frame to fill
-basic_strategy_corrected = pd.DataFrame(columns = dealer_upcard, index = no_ace_hand)
-basic_strategy_ace = pd.DataFrame(columns = dealer_upcard, index = ace_hand)
-basic_strategy_corrected = pd.concat([basic_strategy_corrected, basic_strategy_ace], axis=0)
+# generateBS(QTables[19], basic_strategy)
+# #empty corrected basic strategy data frame to fill
+# basic_strategy_corrected = pd.DataFrame(columns = dealer_upcard, index = no_ace_hand)
+# basic_strategy_ace = pd.DataFrame(columns = dealer_upcard, index = ace_hand)
+# basic_strategy_corrected = pd.concat([basic_strategy_corrected, basic_strategy_ace], axis=0)
 
 
-generateBS(QTables[19], basic_strategy_corrected,'within 0.5%')
-generateBS(QTables[19], basic_strategy_corrected, 'second action')
+# generateBS(QTables[19], basic_strategy_corrected,'within 0.5%')
+# generateBS(QTables[19], basic_strategy_corrected, 'second action')
 
 reverse_states_dict = {}
 

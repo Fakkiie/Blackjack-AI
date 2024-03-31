@@ -30,29 +30,40 @@ states_dict = {}
 for i in np.arange(len(all_states)):
     states_dict[str(all_states[i])] = i
 
-def playGame(rounds, save_path=None):
+def playGame(rounds, save_path):
     s = shoe()
     player = Player()  # Assuming starting balance is set in Player's __init__
     rnd = 0
-    epsilon = 0.8
-    gamma = 0.35
+    epsilon = 0.8 #0.8
+    gamma = 0.35 #0.35
     record = []
     bets = []  # Track all bets
-    outcomes = []  # Track win(1), loss(0), push(2)
-    balances = [player.balance]  # Track player balance over time
+    balances = []  # Track player balance over time
 
-    while rnd < rounds:
+    while rnd < rounds: #and player.balance > 0:
         if rnd % (rounds // 90) == 0:
-            epsilon *= 0.9
+            epsilon *= 0.90
             print(f"{rnd} rounds done", end='\r')
         if s.shufflePoint < 234:
-            bet, result = playRound(s, epsilon, gamma)
-            record.append(result)
+            bet, reward, result = playRound(s, player, epsilon, gamma)
+            player.balance += reward
+            if rnd >= rounds-10000:
+                if result == 2:
+                    record.append(0.5)
+                elif result != 3:
+                    record.append(result)
+            balances.append(player.balance)
             bets.append(bet)  # Store the bet size
         else:
             s.shuffleShoe()
-            bet, result = playRound(s, epsilon, gamma)
-            record.append(result)
+            bet, reward, result = playRound(s, player, epsilon, gamma)
+            player.balance += reward
+            if rnd >= rounds-10000:
+                if result == 2:
+                    record.append(0.5)
+                elif result != 3:
+                    record.append(result)
+            balances.append(player.balance) 
             bets.append(bet)  # Store the bet size
         rnd += 1
         
@@ -61,21 +72,17 @@ def playGame(rounds, save_path=None):
         np.save(save_path, Q)  # Save the Q-table to the specified path
         print(f"Q-table saved to {save_path}")
 
-    return bets
+    return bets, balances, record
 
-def playRound(s, epsilon, gamma):
+def playRound(s: shoe, player: Player, epsilon, gamma):
     h = hand()
     dh = hand()
-    reward = 10  # Base reward
     
-    # Adjust the bet based on the card count
-    # For simplicity, let's just double the reward if the count is positive
-    if s.count > 0:
-        reward *= 2  # Double the bet if the count is positive
-
+    bet = 10
     queue = []
     dealHand(h, dh, s)
     surrender = False
+    reward = bet
 
     while h.handSum < 21:
         state = assignState(h, dh)
@@ -92,7 +99,7 @@ def playRound(s, epsilon, gamma):
             break
         elif curr_action == 3:  #surrender
             surrender = True
-            reward = reward / 2  # Lose half the bet on surrender
+            reward *= 1  # Lose half the bet on surrender
             break
     
     dealerPlay(dh, s)
@@ -102,12 +109,14 @@ def playRound(s, epsilon, gamma):
         result = determineOutcome(h, dh)
     
     if result == 0:     #loss
-        reward *= -1
+        reward *= -1 
     elif result == 2:   #push
         reward = 0
         
     updateQ(queue, reward, gamma)
-    return reward, result
+
+
+    return bet, reward, result
 
 def updateQ(queue, reward, gamma):
     i = 0
@@ -145,18 +154,22 @@ def whatAction(lst):
     print(lst)
 
 
-bets = playGame(10000000, save_path="Q_table.npy")
+[bets, balance_history, record] = playGame(9000000, save_path="Q_table.npy")
 minimum_bet = min(bets)
 average_bet = sum(bets) / len(bets)
 maximum_bet = max(bets)
+winrate = sum(record) / len(record)
 
 print("Minimum bet size:", minimum_bet)
 print("Average bet size:", average_bet)
 print("Maximum bet size:", maximum_bet)
+print("Winrate:", winrate)
+print("Ending balance:", balance_history[-1])
 
 #Generate Tables/Graphs and display them
 basic_strategy = pd.DataFrame(columns=dealer_upcard, index=no_ace_hand + ace_hand) 
 Q_loaded = np.load("Q_table.npy")
-generateBS(Q_loaded, basic_strategy, 'within 0.5%')  
+generateBS(Q_loaded, basic_strategy, 'None')  
 visualize_basic_strategy(basic_strategy)
-visualize_bets(bets)
+# visualize_bets(bets)
+visualize_balance(balance_history)
